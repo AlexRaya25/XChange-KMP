@@ -5,5 +5,6 @@ import com.rayadev.xchange.presentation.exchange.ExchangeViewModel
 import org.koin.dsl.module
 
 val desktopAppModule = module {
+    single { NumberFormatter() }
     single { ExchangeViewModel(get(), DesktopChartDrawer()) }
 }

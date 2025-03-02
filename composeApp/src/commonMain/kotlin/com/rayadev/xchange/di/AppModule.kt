@@ -1,12 +1,13 @@
 package com.xchange.di
 
-import com.rayadev.xchange.data.remote.createHttpClient
+import com.rayadev.xchange.NumberFormatter
+import com.rayadev.xchange.data.remote.HttpClientFactory
 import com.xchange.data.remote.FrankfurterApi
 import org.koin.dsl.module
 import com.rayadev.xchange.di.Result
 
 val appModule = module {
-    single { createHttpClient() }
+    single { get<HttpClientFactory>().createHttpClient() }
     single { FrankfurterApi(get()) }
     single { ExchangeService(get()) }
 }

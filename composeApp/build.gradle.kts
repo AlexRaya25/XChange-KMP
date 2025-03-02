@@ -66,12 +66,12 @@ kotlin {
 
                 implementation(compose.desktop.currentOs)
                 implementation(libs.kotlinx.coroutines.swing)
-                implementation("org.openjfx:javafx-base:19:$platform")
-                implementation("org.openjfx:javafx-graphics:19:$platform")
-                implementation("org.openjfx:javafx-controls:19:$platform")
-                implementation("org.openjfx:javafx-swing:19:$platform")
-                implementation("org.openjfx:javafx-web:19:$platform")
-                implementation("org.openjfx:javafx-media:19:$platform")
+                //implementation("org.openjfx:javafx-base:19:$platform")
+                //implementation("org.openjfx:javafx-graphics:19:$platform")
+                //implementation("org.openjfx:javafx-controls:19:$platform")
+                //implementation("org.openjfx:javafx-swing:19:$platform")
+                //implementation("org.openjfx:javafx-web:19:$platform")
+                //implementation("org.openjfx:javafx-media:19:$platform")
                 // Add other desktop-specific dependencies here
             }
         }
@@ -105,6 +105,25 @@ kotlin {
                 implementation("io.insert-koin:koin-androidx-compose:3.5.0")
                 implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
             }
+        }
+
+        val iosMain by creating {
+            dependsOn(commonMain)
+            dependencies {
+                implementation("io.ktor:ktor-client-darwin:2.3.0")
+            }
+        }
+
+        val iosX64Main by getting {
+            dependsOn(iosMain)
+        }
+
+        val iosArm64Main by getting {
+            dependsOn(iosMain)
+        }
+
+        val iosSimulatorArm64Main by getting {
+            dependsOn(iosMain)
         }
     }
 }

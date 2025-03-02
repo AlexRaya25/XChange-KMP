@@ -13,7 +13,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import java.text.DecimalFormat
+import com.rayadev.xchange.NumberFormatter
 
 @Composable
 fun ConversionTable(
@@ -76,11 +76,11 @@ fun ConversionTable(
                     )
                 }
 
-                // Lista de conversiones
+                val numberFormatter = NumberFormatter.getInstance()
+
                 amounts.forEach { amount ->
                     val convertedAmount = amount * exchangeRates
-                    val decimalFormat = DecimalFormat("#,##0.##")
-                    val formattedAmount = decimalFormat.format(convertedAmount)
+                    val formattedAmount = numberFormatter.format(convertedAmount)
 
                     // Fila con los valores
                     Row(

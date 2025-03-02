@@ -6,13 +6,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.rayadev.xchange.NumberFormatter
 import com.rayadev.xchange.chart.ChartDrawer
 import com.xchange.di.ExchangeService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.rayadev.xchange.di.Result
-import java.text.DecimalFormat
 
 class ExchangeViewModel(private val exchangeService: ExchangeService, private val chartDrawer: ChartDrawer) : ViewModel() {
 
@@ -93,9 +93,7 @@ class ExchangeViewModel(private val exchangeService: ExchangeService, private va
         viewModelScope.launch {
             when (val result = exchangeService.convert(1.00, from, to)) {
                 is Result.Success -> {
-                    val decimalFormat = DecimalFormat("#.#####")
-                    val formattedAmount = decimalFormat.format(result.value)
-
+                    val formattedAmount = formatNumber(result.value)
                     _amountFirst.value = formattedAmount.toDouble()
                 }
                 is Result.Failure -> {}
@@ -107,9 +105,7 @@ class ExchangeViewModel(private val exchangeService: ExchangeService, private va
         viewModelScope.launch {
             when (val result = exchangeService.convert(amount, from, to)) {
                 is Result.Success -> {
-                    val decimalFormat = DecimalFormat("#.#####")
-                    val formattedAmount = decimalFormat.format(result.value)
-
+                    val formattedAmount = formatNumber(result.value)
                     _resultTop.value = "$amount $name1 = "
                     _resultBottom.value = "$formattedAmount $name2"
                     _amount2.value = formattedAmount
@@ -122,6 +118,12 @@ class ExchangeViewModel(private val exchangeService: ExchangeService, private va
             }
         }
     }
+
+
+    fun formatNumber(value: Double): String {
+        return NumberFormatter.getInstance().format(value)
+    }
+
 
     private fun handleApiError(exception: Throwable) {
         _exchangeRates.value = emptyMap()

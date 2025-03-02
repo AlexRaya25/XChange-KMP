@@ -7,10 +7,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.unit.dp
-import javafx.application.Platform
-import javafx.embed.swing.JFXPanel
-import javafx.scene.Scene
-import javafx.scene.web.WebView
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -87,7 +83,6 @@ class DesktopChartDrawer : ChartDrawer {
 
         Column(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier.fillMaxWidth().height(300.dp)) {
-                WebViewChart(echartsHtml)
             }
 
             if (showPriceBox) {
@@ -110,39 +105,6 @@ class DesktopChartDrawer : ChartDrawer {
                 }
             }
         }
-    }
-
-    @Composable
-    fun WebViewChart(htmlContent: String) {
-        var jfxPanel by remember { mutableStateOf<JFXPanel?>(null) }
-
-        LaunchedEffect(Unit) {
-            if (jfxPanel == null) {
-                jfxPanel = JFXPanel() // Create the JFXPanel
-
-                // Ensure this runs on the JavaFX Application Thread
-                Platform.runLater {
-                    val webView = WebView()
-                    val webEngine = webView.engine
-                    val scene = Scene(webView)
-
-                    webEngine.apply {
-                        isJavaScriptEnabled = true
-                        loadContent(htmlContent)
-                    }
-
-                    jfxPanel?.scene = scene
-                }
-            }
-        }
-
-        // Render the JFXPanel in the UI
-        SwingPanel(
-            modifier = Modifier.fillMaxSize(),
-            factory = {
-                jfxPanel ?: JFXPanel() // Create the JFXPanel if it doesn't exist
-            }
-        )
     }
 
     private fun generateXLabels(days: Int, step: Int): List<String> {
