@@ -22,7 +22,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-
 @Composable
 fun CurrencyCard(
     amount: String,
@@ -40,8 +39,8 @@ fun CurrencyCard(
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White, // Fondo blanco para un look limpio
-            contentColor = Color.Black // Texto oscuro para contraste
+            containerColor = Color.White,
+            contentColor = Color.Black
         )
     ) {
         Column(
@@ -52,14 +51,13 @@ fun CurrencyCard(
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelMedium.copy(
-                    color = Color.Gray, // Texto gris para el label
+                    color = Color.Gray,
                     fontSize = 14.sp
                 )
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Campo de texto para la cantidad
             OutlinedTextField(
                 value = amount,
                 onValueChange = onAmountChange,
@@ -84,7 +82,6 @@ fun CurrencyCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Selector de moneda
             CurrencyDropdown(
                 currency = currency,
                 currencies = currencies,

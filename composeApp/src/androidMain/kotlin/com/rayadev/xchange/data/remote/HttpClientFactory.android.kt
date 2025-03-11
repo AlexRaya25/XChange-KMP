@@ -11,7 +11,7 @@ import java.security.cert.X509Certificate
 import javax.net.ssl.X509TrustManager
 
 @Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
-actual class HttpClientFactory() {
+actual class HttpClientFactory {
 
     actual fun createHttpClient(): HttpClient {
         return HttpClient(CIO) {

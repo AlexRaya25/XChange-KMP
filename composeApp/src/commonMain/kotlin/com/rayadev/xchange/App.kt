@@ -1,7 +1,12 @@
 package com.rayadev.xchange
 
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -18,6 +23,7 @@ import xchange.composeapp.generated.resources.app_name
 fun App(sharedViewModel: ExchangeViewModel) {
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    var reloadTrigger by remember { mutableStateOf(0) }
 
     CustomTheme {
         Scaffold(
@@ -30,6 +36,15 @@ fun App(sharedViewModel: ExchangeViewModel) {
                             color = MaterialTheme.colorScheme.onSurface
                         )
                     },
+                    actions = {
+                        IconButton(onClick = { reloadTrigger++ }) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = "Recargar",
+                                tint = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                    },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.surface,
                         scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
@@ -41,11 +56,13 @@ fun App(sharedViewModel: ExchangeViewModel) {
                     modifier = Modifier.shadow(elevation = 4.dp)
                 )
             },
-            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
-        ) {paddingValues ->
-            ExchangeScreen(sharedViewModel, paddingValues)
+            modifier = Modifier
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .wrapContentSize(Alignment.Center)
+                .widthIn(max = 800.dp)
+        ) { paddingValues ->
+            // La recomposición se dispara cuando reloadTrigger cambia
+            ExchangeScreen(sharedViewModel, paddingValues, reloadTrigger)
         }
     }
 }
-
-

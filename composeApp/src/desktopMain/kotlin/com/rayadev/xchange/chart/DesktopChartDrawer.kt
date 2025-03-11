@@ -1,17 +1,33 @@
 package com.rayadev.xchange.chart
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.awt.SwingPanel
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
+import io.github.koalaplot.core.line.AreaBaseline
+import io.github.koalaplot.core.line.AreaPlot
+import io.github.koalaplot.core.style.AreaStyle
+import io.github.koalaplot.core.style.KoalaPlotTheme
+import io.github.koalaplot.core.style.LineStyle
+import io.github.koalaplot.core.util.ExperimentalKoalaPlotApi
+import io.github.koalaplot.core.xygraph.DefaultPoint
+import io.github.koalaplot.core.xygraph.XYGraph
+import io.github.koalaplot.core.xygraph.autoScaleXRange
+import io.github.koalaplot.core.xygraph.autoScaleYRange
+import io.github.koalaplot.core.xygraph.rememberFloatLinearAxisModel
+import org.jetbrains.compose.resources.stringResource
+import xchange.composeapp.generated.resources.Res
+import xchange.composeapp.generated.resources.text_1_month
+import xchange.composeapp.generated.resources.text_1_year
+import xchange.composeapp.generated.resources.text_5_days
+import xchange.composeapp.generated.resources.text_6_month
 import java.text.SimpleDateFormat
 import java.util.*
 
 class DesktopChartDrawer : ChartDrawer {
 
+    @Suppress("DefaultLocale")
+    @OptIn(ExperimentalKoalaPlotApi::class)
     @Composable
     override fun DrawLineChart(
         data: Map<String, Double>,
@@ -22,97 +38,81 @@ class DesktopChartDrawer : ChartDrawer {
             return
         }
 
-        var selectedPrice by remember { mutableStateOf("") }
-        var selectedDate by remember { mutableStateOf("") }
-        var showPriceBox by remember { mutableStateOf(false) }
+        var filteredEntries by remember { mutableStateOf<List<DefaultPoint<Float, Float>>>(emptyList()) }
+        var xLabels by remember { mutableStateOf<List<String>>(emptyList()) }
 
-        val sortedEntries = data.entries.sortedBy {
-            SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(it.key) ?: Date()
-        }
+        val text5Days = stringResource(Res.string.text_5_days)
+        val text1Month = stringResource(Res.string.text_1_month)
+        val text6Month = stringResource(Res.string.text_6_month)
+        val text1Year = stringResource(Res.string.text_1_year)
 
-        val (filteredData, xLabels) = when (selectedRange) {
-            "5 días" -> sortedEntries.takeLast(5) to generateXLabels(5, 1)
-            "1 mes" -> sortedEntries.takeLast(30) to generateXLabels(30, 1)
-            "6 meses" -> sortedEntries.takeLast(180) to generateXLabels(180, 1)
-            "1 año" -> sortedEntries.takeLast(365) to generateXLabels(365, 1)
-            else -> sortedEntries.takeLast(5) to generateXLabels(5, 1)
-        }
-
-        val dataValues = filteredData.map { it.value }
-        val dataLabels = xLabels
-
-        val echartsHtml = """
-        <html>
-            <head>
-                <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
-            </head>
-            <body>
-                <div id="chart" style="width: 100%; height: 100%;"></div>
-                <script>
-                    var chart = echarts.init(document.getElementById('chart'));
-                    var option = {
-                        tooltip: { trigger: 'axis' },
-                        xAxis: { 
-                            type: 'category', 
-                            data: ${dataLabels.map { "\"$it\"" }} 
-                        },
-                        yAxis: { type: 'value' },
-                        series: [{
-                            name: 'Exchange Rate',
-                            type: 'line',
-                            smooth: true,
-                            areaStyle: {},
-                            data: $dataValues
-                        }]
-                    };
-                    chart.setOption(option);
-
-                    chart.on('mouseover', function (params) {
-                        if (params.seriesType === 'line') {
-                            window.bridge.onValueSelected(params.data, params.name);
-                        }
-                    });
-
-                    chart.on('mouseout', function () {
-                        window.bridge.onNothingSelected();
-                    });
-                </script>
-            </body>
-        </html>
-        """.trimIndent()
-
-        Column(modifier = Modifier.fillMaxSize()) {
-            Box(modifier = Modifier.fillMaxWidth().height(300.dp)) {
+        LaunchedEffect(selectedRange, data) {
+            val sortedEntries = data.entries.sortedBy {
+                SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(it.key) ?: Date()
             }
 
-            if (showPriceBox) {
-                Box(
-                    modifier = Modifier.fillMaxSize().padding(24.dp),
-                    contentAlignment = Alignment.TopEnd
-                ) {
-                    Card(
-                        modifier = Modifier.width(90.dp).height(50.dp),
-                        shape = MaterialTheme.shapes.small
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(8.dp).fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(text = selectedPrice, style = MaterialTheme.typography.bodyMedium)
-                            Text(text = selectedDate, style = MaterialTheme.typography.bodySmall)
+            val (filteredData, newXLabels) = when (selectedRange) {
+                text5Days -> sortedEntries.takeLast(5) to generateXLabels(sortedEntries.takeLast(5))
+                text1Month -> sortedEntries.takeLast(30) to generateXLabels(sortedEntries.takeLast(30))
+                text6Month -> sortedEntries.takeLast(180) to generateXLabels(sortedEntries.takeLast(180))
+                text1Year -> sortedEntries.takeLast(365) to generateXLabels(sortedEntries.takeLast(365))
+                else -> sortedEntries.takeLast(5) to generateXLabels(sortedEntries.takeLast(5))
+            }
+
+            if (filteredData.isNotEmpty()) {
+                filteredEntries = filteredData.mapIndexed { index, entry ->
+                    DefaultPoint(index.toFloat(), "%.3f".format(Locale.US, entry.value).toFloat())
+                }
+            }
+
+            xLabels = if (newXLabels.size == filteredEntries.size) {
+                newXLabels
+            } else {
+                List(filteredEntries.size) { "" }
+            }
+        }
+
+        KoalaPlotTheme(
+            axis = KoalaPlotTheme.axis.copy(
+                color = Color.Black,
+                minorGridlineStyle = null
+            )
+        ) {
+            if (filteredEntries.isNotEmpty() && xLabels.isNotEmpty()) {
+                XYGraph(
+                    xAxisModel = rememberFloatLinearAxisModel(filteredEntries.autoScaleXRange()),
+                    yAxisModel = rememberFloatLinearAxisModel(filteredEntries.autoScaleYRange()),
+                    xAxisLabels = { index ->
+                        if (index.toInt() in xLabels.indices) {
+                            xLabels[index.toInt()]
+                        } else {
+                            ""
                         }
                     }
+                ) {
+                    AreaPlot(
+                        data = filteredEntries,
+                        lineStyle = LineStyle(
+                            brush = SolidColor(Color(0xFF007BFF)),
+                            strokeWidth = 1.dp
+                        ),
+                        areaStyle = AreaStyle(
+                            brush = SolidColor(Color(0x22007BFF)),
+                            alpha = 1.0f
+                        ),
+                        areaBaseline = AreaBaseline.ConstantLine(0f)
+                    )
                 }
             }
         }
     }
 
-    private fun generateXLabels(days: Int, step: Int): List<String> {
-        val calendar = Calendar.getInstance()
+    private fun generateXLabels(filteredData: List<Map.Entry<String, Double>>): List<String> {
         val dateFormat = SimpleDateFormat("d MMM", Locale.getDefault())
-        return (0 until days step step).map {
-            calendar.add(Calendar.DAY_OF_YEAR, -step)
-            dateFormat.format(calendar.time)
-        }.reversed()
+        return filteredData.map { entry ->
+            dateFormat.format(
+                SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(entry.key) ?: Date()
+            )
+        }
     }
 }

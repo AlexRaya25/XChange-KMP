@@ -13,6 +13,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import com.rayadev.xchange.di.Result
+import org.jetbrains.compose.resources.stringResource
+import xchange.composeapp.generated.resources.Res
+import xchange.composeapp.generated.resources.load_graph
 
 class ExchangeViewModel(private val exchangeService: ExchangeService, private val chartDrawer: ChartDrawer) : ViewModel() {
 
@@ -34,11 +37,8 @@ class ExchangeViewModel(private val exchangeService: ExchangeService, private va
     private val _exchangeRates = MutableStateFlow<Map<String, Double>>(emptyMap())
     val exchangeRates: StateFlow<Map<String, Double>> = _exchangeRates
 
-    private val _selectedRange = MutableStateFlow("5 días")
+    private val _selectedRange = MutableStateFlow("")
     val selectedRange: StateFlow<String> = _selectedRange
-
-    private val _conversionResults = MutableStateFlow<List<Pair<Int, Double>>>(emptyList())
-    val conversionResults: StateFlow<List<Pair<Int, Double>>> = _conversionResults
 
     init {
         loadCurrencies()
@@ -52,9 +52,14 @@ class ExchangeViewModel(private val exchangeService: ExchangeService, private va
                 }
                 is Result.Failure -> {
                     handleApiError(result.exception)
+                    _currencies.value = emptyMap()
                 }
             }
         }
+    }
+
+    fun refreshCurrencies() {
+        loadCurrencies()
     }
 
     fun fetchExchangeRates(from: String, to: String) {
@@ -85,7 +90,7 @@ class ExchangeViewModel(private val exchangeService: ExchangeService, private va
                 onRangeChange = onRangeChange
             )
         } else {
-            Text("Cargando datos del gráfico...")
+            Text(stringResource(Res.string.load_graph))
         }
     }
 
@@ -93,7 +98,7 @@ class ExchangeViewModel(private val exchangeService: ExchangeService, private va
         viewModelScope.launch {
             when (val result = exchangeService.convert(1.00, from, to)) {
                 is Result.Success -> {
-                    val formattedAmount = formatNumber(result.value)
+                    val formattedAmount = formatNumber(result.value).replace(",", "")
                     _amountFirst.value = formattedAmount.toDouble()
                 }
                 is Result.Failure -> {}
@@ -105,14 +110,14 @@ class ExchangeViewModel(private val exchangeService: ExchangeService, private va
         viewModelScope.launch {
             when (val result = exchangeService.convert(amount, from, to)) {
                 is Result.Success -> {
-                    val formattedAmount = formatNumber(result.value)
+                    val formattedAmount = formatNumber(result.value).replace(",", "")
                     _resultTop.value = "$amount $name1 = "
                     _resultBottom.value = "$formattedAmount $name2"
                     _amount2.value = formattedAmount
                 }
                 is Result.Failure -> {
-                    _resultTop.value = "Error en la conversión"
-                    _resultBottom.value = result.exception.message ?: "Error desconocido"
+                    _resultTop.value = "Error"
+                    _resultBottom.value = result.exception.message ?: "Unknown Error"
                     _amount2.value = ""
                 }
             }

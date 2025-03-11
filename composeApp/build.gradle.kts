@@ -20,58 +20,44 @@ kotlin {
         }
     }
 
-    listOf(
-        iosX64(),
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "ComposeApp"
-            isStatic = true
-        }
-    }
+//    listOf(
+//        iosX64(),
+//        iosArm64(),
+//        iosSimulatorArm64()
+//    ).forEach { iosTarget ->
+//        iosTarget.binaries.framework {
+//            baseName = "ComposeApp"
+//            isStatic = true
+//        }
+//    }
 
     jvm("desktop")
 
 //    @OptIn(ExperimentalWasmDsl::class)
-  //  wasmJs {
-    //    moduleName = "composeApp"
-      //  browser {
-        //    val rootDirPath = project.rootDir.path
-          //  val projectDirPath = project.projectDir.path
-            //commonWebpackConfig {
-              //  outputFileName = "composeApp.js"
-                //devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-                  //  static = (static ?: mutableListOf()).apply {
-                        // Serve sources to debug inside browser
-                    //    add(rootDirPath)
-                      //  add(projectDirPath)
-                    //}
-                //}
-            //}
-        //}
-        //binaries.executable()
-    //}
+//    wasmJs {
+//      moduleName = "composeApp"
+//       browser {
+//            val rootDirPath = project.rootDir.path
+//            val projectDirPath = project.projectDir.path
+//            commonWebpackConfig {
+//                outputFileName = "composeApp.js"
+//                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+//                    static = (static ?: mutableListOf()).apply {
+//                        add(rootDirPath)
+//                        add(projectDirPath)
+//                    }
+//                }
+//            }
+//        }
+//        binaries.executable()
+//    }
 
     sourceSets {
         val desktopMain by getting {
             dependencies {
-                val osName = System.getProperty("os.name").lowercase()
-                val platform = when {
-                    osName.contains("win") -> "win"
-                    osName.contains("nux") -> "linux"
-                    osName.contains("mac") -> "mac"
-                    else -> throw GradleException("Unsupported OS: $osName")
-                }
-
                 implementation(compose.desktop.currentOs)
                 implementation(libs.kotlinx.coroutines.swing)
-                //implementation("org.openjfx:javafx-base:19:$platform")
-                //implementation("org.openjfx:javafx-graphics:19:$platform")
-                //implementation("org.openjfx:javafx-controls:19:$platform")
-                //implementation("org.openjfx:javafx-swing:19:$platform")
-                //implementation("org.openjfx:javafx-web:19:$platform")
-                //implementation("org.openjfx:javafx-media:19:$platform")
+                implementation(libs.koalaplot.core)
                 // Add other desktop-specific dependencies here
             }
         }
@@ -87,14 +73,14 @@ kotlin {
                 implementation(libs.ktor.client.core)
                 implementation(libs.ktor.client.json)
                 implementation(libs.ktor.serialization.kotlinx.json)
-                implementation("io.ktor:ktor-client-serialization:2.3.0")
-                implementation("io.ktor:ktor-client-logging:2.3.0")
+                implementation(libs.ktor.client.serialization)
+                implementation(libs.ktor.client.logging)
                 implementation(libs.ktor.client.cio)
                 implementation(libs.ktor.client.content.negotiation)
-                implementation("io.insert-koin:koin-core:3.5.0")
+                implementation(libs.koin.core)
                 implementation(libs.androidx.lifecycle.viewmodel)
                 implementation(libs.androidx.lifecycle.runtime.compose)
-                implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+                implementation(libs.kotlin.stdlib.jdk8)
             }
         }
 
@@ -102,29 +88,41 @@ kotlin {
             dependencies {
                 implementation(compose.preview)
                 implementation(libs.androidx.activity.compose)
-                implementation("io.insert-koin:koin-androidx-compose:3.5.0")
-                implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+                implementation(libs.koin.androidx.compose)
+                implementation(libs.mpandroidchart)
             }
         }
 
-        val iosMain by creating {
-            dependsOn(commonMain)
-            dependencies {
-                implementation("io.ktor:ktor-client-darwin:2.3.0")
-            }
-        }
+//        val iosMain by creating {
+//            dependsOn(commonMain)
+//            dependencies {
+//                implementation(libs.ktor.client.darwin)
+//            }
+//        }
+//
+//        val iosX64Main by getting {
+//            dependsOn(iosMain)
+//        }
+//
+//        val iosArm64Main by getting {
+//            dependsOn(iosMain)
+//        }
+//
+//        val iosSimulatorArm64Main by getting {
+//            dependsOn(iosMain)
+//        }
 
-        val iosX64Main by getting {
-            dependsOn(iosMain)
-        }
-
-        val iosArm64Main by getting {
-            dependsOn(iosMain)
-        }
-
-        val iosSimulatorArm64Main by getting {
-            dependsOn(iosMain)
-        }
+//        val wasmJsMain by getting {
+//            dependsOn(commonMain)
+//            dependencies {
+//                implementation(kotlin("stdlib"))
+//                implementation("io.github.koalaplot:koalaplot-core:0.8.0")
+//                //implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
+//                implementation("io.ktor:ktor-client-js:3.1.1")
+//                implementation("io.ktor:ktor-client-content-negotiation:3.1.1")
+//                implementation("io.ktor:ktor-serialization-kotlinx-json:3.1.1")
+//            }
+//        }
     }
 }
 
@@ -171,3 +169,4 @@ compose.desktop {
         }
     }
 }
+

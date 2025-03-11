@@ -2,18 +2,12 @@ package com.rayadev.xchange.chart
 
 import android.annotation.SuppressLint
 import android.graphics.Color
-import android.util.Log
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,6 +18,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -40,6 +35,13 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.highlight.Highlight
 import com.github.mikephil.charting.listener.OnChartValueSelectedListener
+import org.jetbrains.compose.resources.stringResource
+import xchange.composeapp.generated.resources.Res
+import xchange.composeapp.generated.resources.text_1_month
+import xchange.composeapp.generated.resources.text_1_year
+import xchange.composeapp.generated.resources.text_5_days
+import xchange.composeapp.generated.resources.text_6_month
+import xchange.composeapp.generated.resources.text_exchange_rate
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -55,19 +57,25 @@ class AndroidChartDrawer : ChartDrawer {
         onRangeChange: (String) -> Unit
     ) {
         if (data.isEmpty()) {
-            Log.d("ChartDrawer", "No hay datos para mostrar en el gráfico")
+            //Log.d("ChartDrawer", "No hay datos para mostrar en el gráfico")
             return
         }
 
         var selectedPrice by remember { mutableStateOf("") }
         var selectedDate by remember { mutableStateOf("") }
         var showPriceBox by remember { mutableStateOf(false) }
-        var selectedX by remember { mutableStateOf(0f) }
-        var selectedY by remember { mutableStateOf(0f) }
+        var selectedX by remember { mutableFloatStateOf(0f) }
+        var selectedY by remember { mutableFloatStateOf(0f) }
+
         var filteredEntries by remember { mutableStateOf<List<Entry>>(emptyList()) }
         var xLabels by remember { mutableStateOf<List<String>>(emptyList()) }
 
-        LaunchedEffect(selectedRange,data) {
+        val text5Days = stringResource(Res.string.text_5_days)
+        val text1Month = stringResource(Res.string.text_1_month)
+        val text6Month = stringResource(Res.string.text_6_month)
+        val text1Year = stringResource(Res.string.text_1_year)
+
+        LaunchedEffect(selectedRange, data) {
             val sortedEntries = data.entries.sortedBy {
                 SimpleDateFormat(
                     "yyyy-MM-dd",
@@ -76,10 +84,10 @@ class AndroidChartDrawer : ChartDrawer {
             }
 
             val (filteredData, newXLabels) = when (selectedRange) {
-                "5 días" -> sortedEntries.takeLast(5) to generateXLabels(5, 1)
-                "1 mes" -> sortedEntries.takeLast(30) to generateXLabels(30, 1)
-                "6 meses" -> sortedEntries.takeLast(180) to generateXLabels(180, 1)
-                "1 año" -> sortedEntries.takeLast(365) to generateXLabels(365, 1)
+                text5Days -> sortedEntries.takeLast(5) to generateXLabels(5, 1)
+                text1Month -> sortedEntries.takeLast(30) to generateXLabels(30, 1)
+                text6Month -> sortedEntries.takeLast(180) to generateXLabels(180, 1)
+                text1Year -> sortedEntries.takeLast(365) to generateXLabels(365, 1)
                 else -> sortedEntries.takeLast(5) to generateXLabels(5, 1)
             }
 
@@ -89,7 +97,7 @@ class AndroidChartDrawer : ChartDrawer {
             xLabels = newXLabels
         }
 
-        val dataSet = LineDataSet(filteredEntries, "Exchange Rate").apply {
+        val dataSet = LineDataSet(filteredEntries, stringResource(Res.string.text_exchange_rate)).apply {
             color = 0xFF007BFF.toInt()
             valueTextColor = Color.BLACK
             lineWidth = 2f
@@ -102,104 +110,96 @@ class AndroidChartDrawer : ChartDrawer {
         }
 
         Column(modifier = Modifier.fillMaxSize()) {
-            AnimatedVisibility(
-                visible = filteredEntries.isNotEmpty(),
-                enter = fadeIn(animationSpec = tween(500)),
-                exit = fadeOut(animationSpec = tween(500))
-            ) {
-                AndroidView(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp),
-                    factory = { context ->
-                        LineChart(context).apply {
-                            setTouchEnabled(true)
-                            setDragEnabled(true)
-                            setScaleEnabled(false)
-                            // Actualizar los datos
-                            this.data = LineData(dataSet)
+            AndroidView(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp),
+                factory = { context ->
+                    LineChart(context).apply {
+                        setTouchEnabled(true)
+                        setDragEnabled(true)
+                        setScaleEnabled(false)
 
-                            xAxis.apply {
-                                position = XAxis.XAxisPosition.BOTTOM
-                                setDrawGridLines(false)
-                                textSize = 12f
-                                valueFormatter = object : ValueFormatter() {
-                                    override fun getFormattedValue(value: Float): String {
-                                        return xLabels.getOrNull(value.toInt()) ?: ""
-                                    }
+                        this.data = LineData(dataSet)
+
+                        xAxis.apply {
+                            position = XAxis.XAxisPosition.BOTTOM
+                            setDrawGridLines(false)
+                            textSize = 12f
+                            valueFormatter = object : ValueFormatter() {
+                                override fun getFormattedValue(value: Float): String {
+                                    return xLabels.getOrNull(value.toInt()) ?: ""
                                 }
-
-                                // Ajusta dinámicamente el número de etiquetas según el número de puntos de datos
-                                val labelCount = if (xLabels.size < 10) xLabels.size else 10
-                                setLabelCount(labelCount, true)
                             }
 
-                            axisLeft.textSize = 12f
-                            axisRight.isEnabled = false
-                            description.isEnabled = false
-                            legend.isEnabled = false
-
-                            setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
-                                override fun onValueSelected(e: Entry?, h: Highlight?) {
-                                    e?.let {
-                                        selectedDate = xLabels.getOrNull(e.x.toInt()) ?: ""
-                                        selectedPrice = "${e.y}"
-                                        selectedX = h?.xPx ?: 0f
-                                        selectedY = h?.yPx ?: 0f
-                                        showPriceBox = true
-                                    }
-                                }
-
-                                override fun onNothingSelected() {
-                                    showPriceBox = false
-                                }
-                            })
+                            val labelCount = if (xLabels.size < 10) xLabels.size else 10
+                            setLabelCount(labelCount, true)
                         }
-                    },
-                    update = { chart ->
-                        // Actualiza el gráfico con los nuevos datos
-                        chart.data = LineData(dataSet)
-                        chart.notifyDataSetChanged()
-                        chart.invalidate() // Asegura que el gráfico se redibuje completamente
-                    }
-                )
 
-                if (showPriceBox) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(24.dp),
-                        contentAlignment = Alignment.TopEnd // Cambia de TopStart a TopEnd
-                    ) {
-                        Card(
-                            modifier = Modifier
-                                .width(90.dp)
-                                .height(50.dp),
-                            shape = RoundedCornerShape(4.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
-                                    alpha = 0.9f
-                                )
-                            )
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .padding(8.dp)
-                                    .fillMaxSize(),
-                                horizontalAlignment = Alignment.CenterHorizontally,
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Text(
-                                    text = selectedPrice,
-                                    fontSize = 12.sp,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                                Text(
-                                    text = selectedDate,
-                                    fontSize = 10.sp,
-                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                                )
+                        axisLeft.textSize = 12f
+                        axisRight.isEnabled = false
+                        description.isEnabled = false
+                        legend.isEnabled = false
+
+                        setOnChartValueSelectedListener(object : OnChartValueSelectedListener {
+                            override fun onValueSelected(e: Entry?, h: Highlight?) {
+                                e?.let {
+                                    selectedDate = xLabels.getOrNull(e.x.toInt()) ?: ""
+                                    selectedPrice = "${e.y}"
+                                    selectedX = h?.xPx ?: 0f
+                                    selectedY = h?.yPx ?: 0f
+                                    showPriceBox = true
+                                }
                             }
+
+                            override fun onNothingSelected() {
+                                showPriceBox = false
+                            }
+                        })
+                    }
+                },
+                update = { chart ->
+                    chart.data = LineData(dataSet)
+                    chart.notifyDataSetChanged()
+                    chart.invalidate()
+                }
+            )
+
+            if (showPriceBox) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
+                    contentAlignment = Alignment.TopEnd
+                ) {
+                    Card(
+                        modifier = Modifier
+                            .width(90.dp)
+                            .height(50.dp),
+                        shape = RoundedCornerShape(4.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(
+                                alpha = 0.9f
+                            )
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .fillMaxSize(),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = selectedPrice,
+                                fontSize = 12.sp,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            Text(
+                                text = selectedDate,
+                                fontSize = 10.sp,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                            )
                         }
                     }
                 }

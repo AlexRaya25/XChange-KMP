@@ -6,23 +6,23 @@ import io.ktor.client.request.*
 import kotlinx.coroutines.delay
 import kotlinx.serialization.Serializable
 import com.rayadev.xchange.di.Result
+import org.jetbrains.compose.resources.stringResource
 
 class FrankfurterApi(private val client: HttpClient) {
 
-    // Función genérica para manejar las llamadas de la API de forma segura
     private suspend fun <T> safeApiCall(apiCall: suspend () -> T): Result<T> {
         var attempt = 0
         var lastError: Throwable? = null
-        while (attempt < 3) {  // Intentos múltiples en caso de error
+        while (attempt < 3) {
             try {
                 return Result.Success(apiCall())
             } catch (e: Exception) {
                 lastError = e
                 attempt++
-                delay(1000)  // Espera entre intentos
+                delay(1000)
             }
         }
-        return Result.Failure(lastError ?: Exception("Error desconocido"))
+        return Result.Failure(lastError ?: Exception("Unknown Error"))
     }
 
     suspend fun getCurrencies(): Result<Map<String, String>> {
@@ -50,7 +50,6 @@ class FrankfurterApi(private val client: HttpClient) {
 }
 
 
-
 @Serializable
 data class ExchangeResponse(
     val rates: Map<String, Double>
@@ -61,5 +60,5 @@ data class ExchangeResponseGraph(
     val base: String,
     val start_date: String,
     val end_date: String,
-    val rates: Map<String, Map<String, Double>> // Mapa de "fecha" -> { "moneda" -> valor }
+    val rates: Map<String, Map<String, Double>>
 )

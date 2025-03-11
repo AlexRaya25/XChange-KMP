@@ -14,6 +14,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.rayadev.xchange.NumberFormatter
+import org.jetbrains.compose.resources.stringResource
+import xchange.composeapp.generated.resources.Res
+import xchange.composeapp.generated.resources.conversion_table
 
 @Composable
 fun ConversionTable(
@@ -22,7 +25,6 @@ fun ConversionTable(
     exchangeRates: Double,
     currencies: Map<String, String>?
 ) {
-    // Valores predefinidos para la conversión
     val amounts = listOf(1, 5, 10, 50, 100, 500, 1000, 5000, 10000)
 
     Column(
@@ -31,7 +33,6 @@ fun ConversionTable(
             .padding(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Tarjeta principal
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -44,16 +45,15 @@ fun ConversionTable(
                 modifier = Modifier.padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Título de la tabla
                 Text(
-                    text = "Tabla de Conversión",
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
+                    text = stringResource(Res.string.conversion_table),
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    ),
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
-                // Encabezados de las monedas
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -62,15 +62,13 @@ fun ConversionTable(
                 ) {
                     Text(
                         text = "${currencies?.get(currency1) ?: currency1}",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurface),
                         textAlign = TextAlign.Start,
                         modifier = Modifier.weight(1f)
                     )
                     Text(
                         text = "${currencies?.get(currency2) ?: currency2}",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.onSurface),
                         textAlign = TextAlign.End,
                         modifier = Modifier.weight(1f)
                     )
@@ -82,7 +80,6 @@ fun ConversionTable(
                     val convertedAmount = amount * exchangeRates
                     val formattedAmount = numberFormatter.format(convertedAmount)
 
-                    // Fila con los valores
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -92,15 +89,19 @@ fun ConversionTable(
                     ) {
                         Text(
                             text = "$amount $currency1",
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.onSurface,
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            ),
                             textAlign = TextAlign.Start,
                             modifier = Modifier.weight(1f)
                         )
                         Text(
                             text = formattedAmount.toString(),
-                            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            ),
                             textAlign = TextAlign.End,
                             modifier = Modifier.weight(1f)
                         )
