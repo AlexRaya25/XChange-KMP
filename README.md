@@ -16,12 +16,19 @@ XChange is a currency conversion application developed with **Kotlin Multiplatfo
 
 ---
 
+## 🌐 Web Version
+
+You can access the **XChange Web App** here:  
+🔗 **[XChange Web](https://alexraya25.github.io/XChange-KMP/)**  
+
+---
+
 ## 🔧 Roadmap
 
 ✅ Support for **Android** 📱  
 ✅ Support for **Desktop** 💻  
 ⬜ Support for **iOS** 🍏  
-⬜ Support for **Web** 🌐  
+✅ Support for **Web** 🌐  
 
 ---
 
