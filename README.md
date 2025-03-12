@@ -2,6 +2,11 @@
 
 XChange is a currency conversion application developed with **Kotlin Multiplatform (KMP)**. It is currently available for **Android** and **Desktop**.
 
+## 🌐 Web Version
+
+You can access the **XChange Web App** here:   🔗 **[XChange Web](https://alexraya25.github.io/XChange-KMP/)**  
+
+
 ## 📸 Screenshots
 
 ### 📱 Mobile Version Images
@@ -16,12 +21,6 @@ XChange is a currency conversion application developed with **Kotlin Multiplatfo
 
 ---
 
-## 🌐 Web Version
-
-You can access the **XChange Web App** here:  
-🔗 **[XChange Web](https://alexraya25.github.io/XChange-KMP/)**  
-
----
 
 ## 🔧 Roadmap
 
