@@ -7,7 +7,7 @@
     <string name= "text_6_month">6 meses</string>
     <string name= "text_1_year">1 año</string>
     <string name= "text_from">De </string>
-    <string name= "text_to">A </string>
+    <string name= "text_to"> A </string>
     <string name= "text_exchange">Intercambiar</string>
 
     <string name= "load_graph">Cargando datos del gráfico...</string>

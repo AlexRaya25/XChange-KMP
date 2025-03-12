@@ -59,7 +59,6 @@ fun App(sharedViewModel: ExchangeViewModel) {
             modifier = Modifier
                 .nestedScroll(scrollBehavior.nestedScrollConnection)
                 .wrapContentSize(Alignment.Center)
-                .widthIn(max = 800.dp)
         ) { paddingValues ->
             // La recomposición se dispara cuando reloadTrigger cambia
             ExchangeScreen(sharedViewModel, paddingValues, reloadTrigger)

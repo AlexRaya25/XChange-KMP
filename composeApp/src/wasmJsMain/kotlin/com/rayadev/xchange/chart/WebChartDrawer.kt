@@ -1,8 +1,35 @@
 package com.rayadev.xchange.chart
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import kotlinx.serialization.json.Json
 
+//fun drawChart() {
+//    // Use a constant string expression for the `js()` function
+//    js(
+//        """
+//        new Chart(document.getElementById('chartCanvas').getContext('2d'), {
+//        type: 'bar',
+//        data: {
+//            labels: ['A', 'B', 'C'],
+//            datasets: [{
+//                label: 'Sample Data',
+//                data: [10, 20, 30],
+//                backgroundColor: 'rgba(54, 162, 235, 0.5)'
+//            }]
+//        }
+//    });
+//        """
+//    )
+//}
+
+@OptIn(ExperimentalJsExport::class)
 class WebChartDrawer : ChartDrawer {
     @Composable
     override fun DrawLineChart(
@@ -10,62 +37,17 @@ class WebChartDrawer : ChartDrawer {
         selectedRange: String,
         onRangeChange: (String) -> Unit
     ) {
-//        val data2 = mapOf(
-//            "2023-01-01" to 100.0,
-//            "2023-01-02" to 120.0,
-//            "2023-01-03" to 90.0,
-//            "2023-01-04" to 110.0,
-//            "2023-01-05" to 150.0
-//        )
-//
-//        var filteredEntries by remember { mutableStateOf<List<DefaultPoint<Float, Float>>>(emptyList()) }
-//        var xLabels by remember { mutableStateOf<List<String>>(emptyList()) }
-//
-//        // Usamos un rango predeterminado
-//        LaunchedEffect(data2) {
-//            val sortedEntries = data2.entries.sortedBy { it.key }
-//
-//            val filteredData = sortedEntries.mapIndexed { index, entry ->
-//                DefaultPoint(index.toFloat(), entry.value.toFloat())
-//            }
-//
-//            filteredEntries = filteredData
-//            xLabels = sortedEntries.map { it.key }
+//        LaunchedEffect(Unit) {
+//            drawChart()
 //        }
-//
-//        KoalaPlotTheme(
-//            axis = KoalaPlotTheme.axis.copy(
-//                color = Color.Black,
-//                minorGridlineStyle = null
-//            )
-//        ) {
-//            if (filteredEntries.isNotEmpty() && xLabels.isNotEmpty()) {
-//                XYGraph(
-//                    xAxisModel = rememberFloatLinearAxisModel(filteredEntries.autoScaleXRange()),
-//                    yAxisModel = rememberFloatLinearAxisModel(filteredEntries.autoScaleYRange()),
-//                    xAxisLabels = { index ->
-//                        if (index.toInt() in xLabels.indices) {
-//                            xLabels[index.toInt()]
-//                        } else {
-//                            ""
-//                        }
-//                    }
-//                ) {
-//                    AreaPlot(
-//                        data = filteredEntries,
-//                        lineStyle = LineStyle(
-//                            brush = SolidColor(Color(0xFF007BFF)),
-//                            strokeWidth = 2.dp
-//                        ),
-//                        areaStyle = AreaStyle(
-//                            brush = SolidColor(Color(0x22007BFF)),
-//                            alpha = 1.0f
-//                        ),
-//                        areaBaseline = AreaBaseline.ConstantLine(0f)
-//                    )
-//                }
-//            }
-//        }
-        Text("hola que tal")
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp)
+                .padding(16.dp)
+        ) {
+            Text("Aquí aparecerá el gráfico")
+        }
     }
 }

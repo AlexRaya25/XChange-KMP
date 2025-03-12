@@ -33,24 +33,24 @@ kotlin {
 
     jvm("desktop")
 
-//    @OptIn(ExperimentalWasmDsl::class)
-//    wasmJs {
-//      moduleName = "composeApp"
-//       browser {
-//            val rootDirPath = project.rootDir.path
-//            val projectDirPath = project.projectDir.path
-//            commonWebpackConfig {
-//                outputFileName = "composeApp.js"
-//                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
-//                    static = (static ?: mutableListOf()).apply {
-//                        add(rootDirPath)
-//                        add(projectDirPath)
-//                    }
-//                }
-//            }
-//        }
-//        binaries.executable()
-//    }
+    @OptIn(ExperimentalWasmDsl::class)
+    wasmJs {
+      moduleName = "composeApp"
+       browser {
+            val rootDirPath = project.rootDir.path
+            val projectDirPath = project.projectDir.path
+            commonWebpackConfig {
+                outputFileName = "composeApp.js"
+                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+                    static = (static ?: mutableListOf()).apply {
+                        add(rootDirPath)
+                        add(projectDirPath)
+                    }
+                }
+            }
+        }
+        binaries.executable()
+    }
 
     sourceSets {
         val desktopMain by getting {
@@ -112,17 +112,15 @@ kotlin {
 //            dependsOn(iosMain)
 //        }
 
-//        val wasmJsMain by getting {
-//            dependsOn(commonMain)
-//            dependencies {
-//                implementation(kotlin("stdlib"))
-//                implementation("io.github.koalaplot:koalaplot-core:0.8.0")
-//                //implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
-//                implementation("io.ktor:ktor-client-js:3.1.1")
-//                implementation("io.ktor:ktor-client-content-negotiation:3.1.1")
-//                implementation("io.ktor:ktor-serialization-kotlinx-json:3.1.1")
-//            }
-//        }
+        val wasmJsMain by getting {
+            dependsOn(commonMain)
+            dependencies {
+                implementation(kotlin("stdlib"))
+                implementation("io.ktor:ktor-client-js:3.1.1")
+                implementation("io.ktor:ktor-client-content-negotiation:3.1.1")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:3.1.1")
+            }
+        }
     }
 }
 

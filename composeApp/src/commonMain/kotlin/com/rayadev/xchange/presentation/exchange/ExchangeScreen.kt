@@ -119,23 +119,33 @@ fun ExchangeScreen(sharedViewModel: ExchangeViewModel, paddingValues: PaddingVal
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            item {
+            item{
                 Text(
                     text = resultTop,
                     style = MaterialTheme.typography.titleSmall.copy(color = MaterialTheme.colorScheme.primary),
-                    modifier = Modifier.padding(top = 16.dp)
+                    modifier = Modifier
+                        .padding(top = 16.dp)
+                        .wrapContentSize(Alignment.Center)
+                        .widthIn(max = 800.dp)
                 )
                 Text(
                     text = resultBottom,
                     style = MaterialTheme.typography.titleLarge.copy(color = MaterialTheme.colorScheme.primary),
-                    modifier = Modifier.padding(top = 8.dp)
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .wrapContentSize(Alignment.Center)
+                        .widthIn(max = 800.dp)
                 )
             }
 
             item { Spacer(modifier = Modifier.height(24.dp)) }
 
             item {
-                Box(modifier = Modifier.height(200.dp)) {
+                Box(modifier = Modifier
+                    .height(200.dp)
+                    .wrapContentSize(Alignment.Center)
+                    .widthIn(max = 800.dp)
+                ) {
                     AnimatedVisibility(
                         visible = !isSwapping,
                         exit = slideOutHorizontally(
@@ -185,7 +195,11 @@ fun ExchangeScreen(sharedViewModel: ExchangeViewModel, paddingValues: PaddingVal
             item { Spacer(modifier = Modifier.height(6.dp)) }
 
             item {
-                Box(modifier = Modifier.height(200.dp)) {
+                Box(modifier = Modifier
+                    .height(200.dp)
+                    .wrapContentSize(Alignment.Center)
+                    .widthIn(max = 800.dp)
+                ) {
                     AnimatedVisibility(
                         visible = !isSwapping,
                         exit = slideOutHorizontally(
@@ -224,7 +238,9 @@ fun ExchangeScreen(sharedViewModel: ExchangeViewModel, paddingValues: PaddingVal
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
+                        .padding(horizontal = 16.dp)
+                        .wrapContentSize(Alignment.Center)
+                        .widthIn(max = 1200.dp),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -259,6 +275,7 @@ fun ExchangeScreen(sharedViewModel: ExchangeViewModel, paddingValues: PaddingVal
                         .fillMaxWidth()
                         .height(1.dp)
                         .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
+                        .widthIn(max = 800.dp)
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -266,7 +283,9 @@ fun ExchangeScreen(sharedViewModel: ExchangeViewModel, paddingValues: PaddingVal
 
             item {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(8.dp)
+                        .widthIn(max = 1000.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     ranges.forEach { range ->
@@ -287,6 +306,8 @@ fun ExchangeScreen(sharedViewModel: ExchangeViewModel, paddingValues: PaddingVal
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                         .height(300.dp)
+                        .wrapContentSize(Alignment.Center)
+                        .widthIn(max = 1200.dp)
                 ) {
                     sharedViewModel.DrawChart(selectedRange) { range ->
                         sharedViewModel.updateSelectedRange(range)

@@ -30,7 +30,9 @@ fun ConversionTable(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(8.dp)
+            .wrapContentSize(Alignment.Center)
+            .widthIn(max = 800.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Card(
